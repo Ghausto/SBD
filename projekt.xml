@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2017.1.1 (Build 111U_SU)" ts="2018-05-27 20:30:27">
+<Project name="Project1" LastModified="2018-05-27 20:30:27.697566">
+  <Items>
+    <ProjectItem name="Shop" type="PKG"></ProjectItem>
+  </Items>
+</Project>
+
+
+<Class name="Shop.Client">
+<Super>%Persistent,%Populate,%XML.Adaptor,%ZEN.DataModel.Adaptor,Shop.Person</Super>
+<TimeChanged>64795,55889.205299</TimeChanged>
+<TimeCreated>64795,54288.212878</TimeCreated>
+
+<Property name="Status">
+<Type>Rank</Type>
+<Required>1</Required>
+</Property>
+
+<Property name="CliOrd">
+<Type>Shop.Order</Type>
+<Cardinality>many</Cardinality>
+<Inverse>OrdCli</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Method name="Introduce">
+<Implementation><![CDATA[
+	set who="Client"
+	Write who,!
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^Shop.ClientD</DataLocation>
+<DefaultData>ClientDefaultData</DefaultData>
+<IdLocation>^Shop.ClientD</IdLocation>
+<IndexLocation>^Shop.ClientI</IndexLocation>
+<StreamLocation>^Shop.ClientS</StreamLocation>
+<Data name="ClientDefaultData">
+<Structure>listnode</Structure>
+<Subscript/>
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>Status</Value>
+</Value>
+<Value name="3">
+<Value>Name</Value>
+</Value>
+<Value name="4">
+<Value>Surname</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+
+
+<Class name="Shop.Items">
+<Super>%Persistent,%Populate,%XML.Adaptor,%ZEN.DataModel.Adaptor</Super>
+<TimeChanged>64795,56014.711976</TimeChanged>
+<TimeCreated>64795,53357.474153</TimeCreated>
+
+<Property name="PricePerApiece">
+<Type>%Integer</Type>
+<Required>1</Required>
+</Property>
+
+<Property name="Name">
+<Type>%String</Type>
+<Required>1</Required>
+</Property>
+
+<Property name="ItemSup">
+<Type>Shop.Supplier</Type>
+<Cardinality>one</Cardinality>
+<Inverse>SupItem</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Index name="ItemSupIndex">
+<Properties>ItemSup</Properties>
+</Index>
+
+<Property name="ItemOrd">
+<Type>Shop.OrderDetails</Type>
+<Cardinality>many</Cardinality>
+<Inverse>OrdDetItem</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^Shop.ItemsD</DataLocation>
+<DefaultData>ItemsDefaultData</DefaultData>
+<IdLocation>^Shop.ItemsD</IdLocation>
+<IndexLocation>^Shop.ItemsI</IndexLocation>
+<StreamLocation>^Shop.ItemsS</StreamLocation>
+<Data name="ItemsDefaultData">
+<Structure>listnode</Structure>
+<Subscript/>
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>PricePerApiece</Value>
+</Value>
+<Value name="3">
+<Value>Name</Value>
+</Value>
+<Value name="4">
+<Value>ItemSup</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+
+
+<Class name="Shop.Order">
+<Super>%Persistent,%Populate,%XML.Adaptor,%ZEN.DataModel.Adaptor</Super>
+<TimeChanged>64795,56414.655218</TimeChanged>
+<TimeCreated>64795,55182.977398</TimeCreated>
+
+<Property name="DataOrder">
+<Type>%DataType</Type>
+<Required>1</Required>
+</Property>
+
+<Property name="Value">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="OrdItem">
+<Type>Shop.OrderDetails</Type>
+<Cardinality>many</Cardinality>
+<Inverse>OrdDetOrd</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Property name="OrdCli">
+<Type>Shop.Client</Type>
+<Cardinality>one</Cardinality>
+<Inverse>CliOrd</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Index name="OrdCliIndex">
+<Properties>OrdCli</Properties>
+</Index>
+
+<Method name="Discount">
+<FormalSpec>id:%Integer</FormalSpec>
+<Language>cache</Language>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[
+		Set client = ##class(Shop.Client).%OpenId(id)
+		Set rank = client.Status.Discount
+	 	Set dis = ..Value * (rank/100)
+	 	Set value = ..Value - dis
+	 	Set ..Value = value
+	 	return dis
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^Shop.OrderD</DataLocation>
+<DefaultData>OrderDefaultData</DefaultData>
+<IdLocation>^Shop.OrderD</IdLocation>
+<IndexLocation>^Shop.OrderI</IndexLocation>
+<StreamLocation>^Shop.OrderS</StreamLocation>
+<Data name="OrderDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>DataOrder</Value>
+</Value>
+<Value name="3">
+<Value>Value</Value>
+</Value>
+<Value name="4">
+<Value>OrdCli</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+
+
+<Class name="Shop.OrderDetails">
+<Super>%Persistent,%Populate,%XML.Adaptor,%ZEN.DataModel.Adaptor</Super>
+<TimeChanged>64795,55888.900904</TimeChanged>
+<TimeCreated>64795,55730.202692</TimeCreated>
+
+<Property name="Sum">
+<Type>%Integer</Type>
+<Required>1</Required>
+</Property>
+
+<Property name="Number">
+<Type>%Integer</Type>
+<Required>1</Required>
+</Property>
+
+<Property name="OrdDetItem">
+<Type>Shop.Items</Type>
+<Cardinality>one</Cardinality>
+<Inverse>ItemOrd</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Index name="OrdDetItemIndex">
+<Properties>OrdDetItem</Properties>
+</Index>
+
+<Property name="OrdDetOrd">
+<Type>Shop.Order</Type>
+<Cardinality>one</Cardinality>
+<Inverse>OrdItem</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Index name="OrdDetOrdIndex">
+<Properties>OrdDetOrd</Properties>
+</Index>
+
+<Method name="Count">
+<FormalSpec>idItem:%Integer,idOrd:%Integer</FormalSpec>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[
+		Set item = ##class(Items).%OpenId(idItem)
+		Set ord = ##class(Order).%OpenId(idOrd)
+		Set price = item.PricePerApiece
+		Set sum = ..Number * price
+		Set ..Sum = sum
+		Set value = ord.Value
+		Set ord.Value = value + sum
+		Return sum
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^Shop.OrderDetailsD</DataLocation>
+<DefaultData>OrderDetailsDefaultData</DefaultData>
+<IdLocation>^Shop.OrderDetailsD</IdLocation>
+<IndexLocation>^Shop.OrderDetailsI</IndexLocation>
+<StreamLocation>^Shop.OrderDetailsS</StreamLocation>
+<Data name="OrderDetailsDefaultData">
+<Structure>listnode</Structure>
+<Subscript/>
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>Sum</Value>
+</Value>
+<Value name="3">
+<Value>Number</Value>
+</Value>
+<Value name="4">
+<Value>OrdDetItem</Value>
+</Value>
+<Value name="5">
+<Value>OrdDetOrd</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+
+
+<Class name="Shop.Person">
+<Abstract>1</Abstract>
+<TimeChanged>64795,52605.388683</TimeChanged>
+<TimeCreated>64795,52605.388683</TimeCreated>
+
+<Property name="Surname">
+<Type>%String</Type>
+<Required>1</Required>
+<Parameter name="MINLEN" value="2"/>
+</Property>
+
+<Property name="Name">
+<Type>%String</Type>
+<Required>1</Required>
+<Parameter name="MINLEN" value="2"/>
+</Property>
+
+<Method name="Introduce">
+<Implementation><![CDATA[		Write "Person",!
+]]></Implementation>
+</Method>
+
+<Method name="CallMyName">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[		Do ..MyName()
+]]></Implementation>
+</Method>
+
+<Method name="MyName">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[		Write "Person",!
+]]></Implementation>
+</Method>
+</Class>
+
+
+
+
+<Class name="Shop.Rank">
+<Super>%Persistent,%Populate,%XML.Adaptor,%ZEN.DataModel.Adaptor</Super>
+<TimeChanged>64795,55888.873179</TimeChanged>
+<TimeCreated>64795,54739.636976</TimeCreated>
+
+<Property name="Title">
+<Type>%String</Type>
+<Required>1</Required>
+</Property>
+
+<Property name="Discount">
+<Type>%Integer</Type>
+<Required>1</Required>
+</Property>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^Shop.RankD</DataLocation>
+<DefaultData>RankDefaultData</DefaultData>
+<IdLocation>^Shop.RankD</IdLocation>
+<IndexLocation>^Shop.RankI</IndexLocation>
+<StreamLocation>^Shop.RankS</StreamLocation>
+<Data name="RankDefaultData">
+<Structure>listnode</Structure>
+<Subscript/>
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>Title</Value>
+</Value>
+<Value name="3">
+<Value>Discount</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+
+
+<Class name="Shop.Supplier">
+<Super>%Persistent,%Populate,%XML.Adaptor,%ZEN.DataModel.Adaptor,Shop.Person</Super>
+<TimeChanged>64795,55889.192888</TimeChanged>
+<TimeCreated>64795,52958.573526</TimeCreated>
+
+<Property name="SupItem">
+<Type>Shop.Items</Type>
+<Cardinality>many</Cardinality>
+<Inverse>ItemSup</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Method name="CallMyName">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[		Do ..MyName()
+]]></Implementation>
+</Method>
+
+<Method name="MyName">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[		Write "Person",!
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^Shop.SupplierD</DataLocation>
+<DefaultData>SupplierDefaultData</DefaultData>
+<IdLocation>^Shop.SupplierD</IdLocation>
+<IndexLocation>^Shop.SupplierI</IndexLocation>
+<StreamLocation>^Shop.SupplierS</StreamLocation>
+<Data name="SupplierDefaultData">
+<Structure>listnode</Structure>
+<Subscript/>
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>Surname</Value>
+</Value>
+<Value name="3">
+<Value>Name</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>
